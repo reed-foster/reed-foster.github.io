@@ -61,8 +61,8 @@ function mandelbrot(canvas, xmin, xmax, ymin, ymax, iterations) {
 }
  
 var canvas = document.createElement('canvas');
-canvas.width = 900;
-canvas.height = 600;
+canvas.width = 1600;
+canvas.height = 900;
  
 document.body.insertBefore(canvas, document.body.childNodes[0]);
  
