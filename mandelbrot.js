@@ -9,7 +9,7 @@ function mandelbrot(canvas, xmin, xmax, ymin, ymax, iterations)
 	var palette = []
 	for (var i = 0; i <= iterations; i++)
 	{
-		palette.push([i / iterations * 255, 0, map(i, 0, 0.5, iterations, 0)])
+		palette.push([i / iterations * 255, 0, map(i, 0, 128, iterations, 0)])
 	}
 	var width = canvas.width;
 	var height = canvas.height;
@@ -55,8 +55,9 @@ function mandelbrot(canvas, xmin, xmax, ymin, ymax, iterations)
 			pix[pix_pos] = color[0];
 			pix[pix_pos + 1] = color[1];
 			pix[pix_pos + 2] = color[2];
-			
+			pix[pix_pos + 3] = 255;
 		}
+		
 	}
 	/*
       var x = xmin + (xmax - xmin) * ix / (width - 1);
