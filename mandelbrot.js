@@ -6,7 +6,7 @@
   var xy = 0;
  
   var i = maxIter;
-  while (i-- && xx + yy <= 4) {
+  while (i-- && xx + yy <= 40) {
     xy = x * y;
     xx = x * x;
     yy = y * y;
