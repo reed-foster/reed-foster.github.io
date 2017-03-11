@@ -60,33 +60,17 @@ function mandelbrot(canvas, xmin, xmax, ymin, ymax, iterations)
 var canvas = document.getElementById('MandelbrotCanvas');
 document.body.insertBefore(canvas, document.body.childNodes[0]);
 
-var xmin = 0, ymin = 0, xmax = canvas.width, ymax = canvas.height;
-var m_last_xmin = -2, m_last_ymin = -1, m_last_xmax = 1, m_last_ymax = 1;
+var zoomlevel = 1;
+var centerx = 0;
+var centery = 0;
 
-canvas.addEventListener('dblclick', function(event) {xmin = 0; ymin = 0; xmax = canvas.width; ymax = canvas.height; m_last_xmin = -2; m_last_ymin = -1; m_last_xmax = 1; m_last_ymax = 1;}, false);
-canvas.addEventListener('mousedown', function(event) {xmin = event.pageX; ymin = event.pageY;}, false);
-canvas.addEventListener('mouseup', function(event)
+canvas.addEventListener('dblclick', function(event) {zoomlevel = 1; mandelbrot(canvas, -2, 1, -1, 1, 50);}, false);
+canvas.addEventListener('wheel', function(event)
 {
-	xmax = event.pageX;
-	ymax = event.pageY;
-	if (xmin > xmax)
-	{
-		var tmp = xmin;
-		xmin = xmax;
-		xmax = tmp;
-	}
-	if (ymin > ymax)
-	{
-		var tmp = ymin;
-		ymin = ymax;
-		ymax = tmp;
-	}
-	m_xmin = map(xmin, 0, canvas.width, m_last_xmin, m_last_xmax);
-	m_xmax = map(xmax, 0, canvas.width, m_last_xmin, m_last_xmax);
-	m_ymin = map(ymin, 0, canvas.height, m_last_ymin, m_last_ymax);
-	m_ymax = map(ymax, 0, canvas.height, m_last_ymin, m_last_ymax);
-	mandelbrot(canvas, m_xmin, m_xmax, m_ymin, m_ymax, 3 * 25 * 1 / (m_xmax - m_xmin));
-	m_last_xmin = m_xmin; m_last_xmax = m_xmax; m_last_ymin = m_ymin; m_last_ymax = m_ymax;
+	zoomlevel /= (100 - (event.deltaY) / 25) / 100;
+	centerx += map(event.pageX, 0, canvas.width, -1.6 * zoomlevel / 10, 1.6 * zoomlevel / 10);
+	centery += map(event.pageY, 0, canvas.height, -zoomlevel / 10, zoomlevel/ 10);
+	mandelbrot(canvas, -2 * zoomlevel + centerx, zoomlevel + centerx, -zoomlevel + centery, zoomlevel + centery, 50 / zoomlevel);
 }, false);
  
 mandelbrot(canvas, -2, 1, -1, 1, 50);
