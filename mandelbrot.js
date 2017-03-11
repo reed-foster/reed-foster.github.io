@@ -51,7 +51,7 @@ function mandelbrot(canvas, xmin, xmax, ymin, ymax, iterations)
 			//color2 = palette[floor(iteration) + 1]
 			//color = linear_interpolate(color1, color2, iteration % 1)
 			//plot(Px, Py, color)
-			color = palette[floor(iteration)];
+			color = palette[Math.floor(iteration)];
 			pix[pix_pos] = color[0];
 			pix[pix_pos + 1] = color[1];
 			pix[pix_pos + 2] = color[2];
