@@ -6,7 +6,7 @@
   var xy = 0;
  
   var i = maxIter;
-  while (i-- && xx + yy <= 40) {
+  while (i-- && xx + yy <= 400) {
     xy = x * y;
     xx = x * x;
     yy = y * y;
@@ -61,9 +61,9 @@ function mandelbrot(canvas, xmin, xmax, ymin, ymax, iterations) {
 }
  
 var canvas = document.createElement('canvas');
-canvas.width = 1600;
-canvas.height = 900;
+canvas.width = 800;
+canvas.height = 500;
  
 document.body.insertBefore(canvas, document.body.childNodes[0]);
  
-mandelbrot(canvas, -2, 1, -1, 1, 10000);
+mandelbrot(canvas, -2, 1, -1, 1, 1000);
