@@ -25,7 +25,7 @@
 			
 			var pix_pos = 4 * (width * iy + ix);
 			
-			while (x*x + y*y < 4  &&  iteration <= iterations)
+			while (x*x + y*y < 16  &&  iteration <= iterations)
 			{
 				xtemp = x*x - y*y + x0;
 				y = 2*x*y + y0;
