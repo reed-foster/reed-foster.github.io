@@ -1,14 +1,4 @@
-﻿function map(x, in_min, in_max, out_min, out_max)
-{
-	return (out_max - out_min) / (in_max - in_min) * (x - in_min) + out_min;
-}
-
-function log_map(x, in_min, in_max, out_min, out_max)
-{
-	return map(x, in_min, in_max, out_min, out_max);
-}
-
-function mandelbrot(canvas, xmin, xmax, ymin, ymax, iterations)
+﻿function mandelbrot(canvas, xmin, xmax, ymin, ymax, iterations)
 {
 	var palette = []
 	for (var i = 0; i <= iterations; i++)
@@ -84,25 +74,29 @@ function mandelbrot(canvas, xmin, xmax, ymin, ymax, iterations)
 	document.getElementById("statusBar").innerHTML = "Center(" + centerx + ", " + -centery + ")";
 }
 
+function map(x, in_min, in_max, out_min, out_max)
+{
+	return (out_max - out_min) / (in_max - in_min) * (x - in_min) + out_min;
+}
+
 function gohome()
 {
 	zoomlevel = 1;
 	itr = 20;
 	centerx = -1;
 	centery = 0;
-	mandelbrot(canvas, -4 * zoomlevel + centerx, 2 * zoomlevel + centerx, -2 * zoomlevel + centery, 2 * zoomlevel + centery, itr);
+	mandelbrot(canvas, -3 * zoomlevel + centerx, 3 * zoomlevel + centerx, -2 * zoomlevel + centery, 2 * zoomlevel + centery, itr);
 }
 
 function zoom()
 {
 	zoomlevel *= 0.99;
 	itr = 20 / (Math.pow(zoomlevel, 0.2));
-	mandelbrot(canvas, -4 * zoomlevel + centerx, 2 * zoomlevel + centerx, -2 * zoomlevel + centery, 2 * zoomlevel + centery, itr);
+	mandelbrot(canvas, -3 * zoomlevel + centerx, 3 * zoomlevel + centerx, -2 * zoomlevel + centery, 2 * zoomlevel + centery, itr);
 }
  
 var canvas = document.getElementById('MandelbrotCanvas');
 document.body.insertBefore(canvas, document.body.childNodes[0]);
-
 var zoomlevel = 1;
 var itr = 20;
 var centerx = -1;
@@ -110,6 +104,7 @@ var centery = 0;
 var centerchangeable = true;
 var zooming = false;
 var timer;
+gohome();
 
 canvas.addEventListener('dblclick', function(event) {gohome();}, false);
 
@@ -127,14 +122,14 @@ canvas.addEventListener('wheel', function(event)
 		centerx += event.deltaY < 0 ? dx : -dx;
 		centery += event.deltaY < 0 ? dy : -dy;
 	}
-	mandelbrot(canvas, -4 * zoomlevel + centerx, 2 * zoomlevel + centerx, -2 * zoomlevel + centery, 2 * zoomlevel + centery, itr);
+	mandelbrot(canvas, -3 * zoomlevel + centerx, 3 * zoomlevel + centerx, -2 * zoomlevel + centery, 2 * zoomlevel + centery, itr);
 }, false);
 
 document.addEventListener('keydown', function(event) {
 	if (event.key == 'r')
 	{
 		itr = 20 / (Math.pow(zoomlevel, 0.2));
-		mandelbrot(canvas, -4 * zoomlevel + centerx, 2 * zoomlevel + centerx, -2 * zoomlevel + centery, 2 * zoomlevel + centery, itr);
+		mandelbrot(canvas, -3 * zoomlevel + centerx, 3 * zoomlevel + centerx, -2 * zoomlevel + centery, 2 * zoomlevel + centery, itr);
 	}
 	if (event.key == 'l')
 	{
@@ -154,5 +149,3 @@ document.addEventListener('keydown', function(event) {
 		}
 	}
 }, false);
- 
-mandelbrot(canvas, -4, 2, -2, 2, itr);
