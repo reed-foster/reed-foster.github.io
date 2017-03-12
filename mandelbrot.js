@@ -3,12 +3,17 @@
 	return (out_max - out_min) / (in_max - in_min) * (x - in_min) + out_min;
 }
 
+function log_map(x, in_min, in_max, out_min, out_max)
+{
+	return map(x, in_min, in_max, out_min, out_max);
+}
+
 function mandelbrot(canvas, xmin, xmax, ymin, ymax, iterations)
 {
 	var palette = []
 	for (var i = 0; i <= iterations; i++)
 	{
-		palette.push([map(i, 0, iterations, 0, 10), map(i, 0, iterations, 75, 255), map(i, 0, iterations, 0, 70)])
+		palette.push([map(i, 0, iterations, 10, 255), map(i, 0, iterations, 10, 255), map(i, 0, iterations, 100, 255)])
 	}
 	palette.push([0, 0, 0]);
 	
@@ -37,7 +42,7 @@ function mandelbrot(canvas, xmin, xmax, ymin, ymax, iterations)
 				x = xtemp;
 				iteration++;
 			}
-			if (iteration == iterations)
+			if (iteration >= iterations)
 			{
 				pix[pix_pos] = 0;
 				pix[pix_pos + 1] = 0;
@@ -45,32 +50,109 @@ function mandelbrot(canvas, xmin, xmax, ymin, ymax, iterations)
 			}
 			else
 			{
-				color = palette[Math.floor(iteration)];
-				pix[pix_pos] = color[0];
-				pix[pix_pos + 1] = color[1];
-				pix[pix_pos + 2] = color[2];
+				for (var i = 0; i < 3; i++)
+				{
+					xtemp = x*x - y*y + x0;
+					y = 2*x*y + y0;
+					x = xtemp;
+					iteration++;
+				}
+				var mu = iteration + 1 - Math.log(Math.log(Math.sqrt(x * x + y * y))) / Math.log(2);
+				var color1 = Math.floor(mu) % palette.length;
+				var color2 = (color1 + 1) % palette.length;
+				var frac = mu % 1;
+				if (color1 < 0 || color1 > palette.length) {console.log(mu);}
+				if (color2 < 0 || color2 > palette.length) {console.log(mu);}
+				var red1 = palette[color1][0];
+				var red2 = palette[color2][0];
+				var grn1 = palette[color1][1];
+				var grn2 = palette[color2][1];
+				var blu1 = palette[color1][2];
+				var blu2 = palette[color2][2];
+				var red = map(frac, 0, 1, red1, red2);
+				var green = map(frac, 0, 1, grn1, grn2);
+				var blue = map(frac, 0, 1, blu1, blu2);
+				pix[pix_pos] = red;
+				pix[pix_pos + 1] = green;
+				pix[pix_pos + 2] = blue;
 			}
 			pix[pix_pos + 3] = 255;
 		}
 		
 	}
 	ctx.putImageData(img, 0, 0);
+	document.getElementById("statusBar").innerHTML = "Center(" + centerx + ", " + -centery + ")";
+}
+
+function gohome()
+{
+	zoomlevel = 1;
+	itr = 20;
+	centerx = -1;
+	centery = 0;
+	mandelbrot(canvas, -4 * zoomlevel + centerx, 2 * zoomlevel + centerx, -2 * zoomlevel + centery, 2 * zoomlevel + centery, itr);
+}
+
+function zoom()
+{
+	zoomlevel *= 0.99;
+	itr = 20 / (Math.pow(zoomlevel, 0.2));
+	mandelbrot(canvas, -4 * zoomlevel + centerx, 2 * zoomlevel + centerx, -2 * zoomlevel + centery, 2 * zoomlevel + centery, itr);
 }
  
 var canvas = document.getElementById('MandelbrotCanvas');
 document.body.insertBefore(canvas, document.body.childNodes[0]);
 
 var zoomlevel = 1;
-var centerx = 0;
+var itr = 20;
+var centerx = -1;
 var centery = 0;
+var centerchangeable = true;
+var zooming = false;
+var timer;
 
-canvas.addEventListener('dblclick', function(event) {zoomlevel = 1; mandelbrot(canvas, -2, 1, -1, 1, 50);}, false);
+canvas.addEventListener('dblclick', function(event) {gohome();}, false);
+
 canvas.addEventListener('wheel', function(event)
 {
 	zoomlevel /= (100 - (event.deltaY) / 25) / 100;
-	centerx += map(event.pageX, 0, canvas.width, -1.6 * zoomlevel / 10, 1.6 * zoomlevel / 10);
-	centery += map(event.pageY, 0, canvas.height, -zoomlevel / 10, zoomlevel/ 10);
-	mandelbrot(canvas, -2 * zoomlevel + centerx, zoomlevel + centerx, -zoomlevel + centery, zoomlevel + centery, 50 / zoomlevel);
+	var x = event.pageX - canvas.width / 2;
+	var y = event.pageY - canvas.height / 2;
+	x *= x * x * zoomlevel / 10;
+	y *= y * y * zoomlevel / 10;
+	if (centerchangeable)
+	{
+		var dx = map(x, ((-canvas.width / 2) ** 3) * 0.05, ((canvas.width / 2) ** 3) * 0.05, -0.075, 0.075);
+		var dy = map(y, ((-canvas.height / 2) ** 3) * 0.05, ((canvas.height / 2) ** 3) * 0.05, -0.05, 0.05);
+		centerx += event.deltaY < 0 ? dx : -dx;
+		centery += event.deltaY < 0 ? dy : -dy;
+	}
+	mandelbrot(canvas, -4 * zoomlevel + centerx, 2 * zoomlevel + centerx, -2 * zoomlevel + centery, 2 * zoomlevel + centery, itr);
+}, false);
+
+document.addEventListener('keydown', function(event) {
+	if (event.key == 'r')
+	{
+		itr = 20 / (Math.pow(zoomlevel, 0.2));
+		mandelbrot(canvas, -4 * zoomlevel + centerx, 2 * zoomlevel + centerx, -2 * zoomlevel + centery, 2 * zoomlevel + centery, itr);
+	}
+	if (event.key == 'l')
+	{
+		centerchangeable = !centerchangeable;
+	}
+	if (event.key == 'z')
+	{
+		if (zooming)
+		{
+			window.clearInterval(timer);
+			zooming = false;
+		}
+		else
+		{
+			timer = window.setInterval(zoom, 10);
+			zooming = true;
+		}
+	}
 }, false);
  
-mandelbrot(canvas, -2, 1, -1, 1, 50);
+mandelbrot(canvas, -4, 2, -2, 2, itr);
