@@ -4,7 +4,14 @@
   </head>
   <body>
 	<canvas id="MandelbrotCanvas" width="1280" height="800"></canvas>
-	<div id="statusBar"></div>
+	<div>x<input id="centerx" type="text" label="x"/>
+	<br/>
+	y<input id="centery" type="text" label="y"/>
+	<br/>
+	zoom<input id="zoomlevel" type="text"/>
+	<br/>
+	<button onclick="redraw()">Draw</button>
+	</div>
     <script language="javascript" type="text/javascript" src="mandelbrot.js">
     </script>
   </body>

@@ -1,11 +1,44 @@
-﻿function mandelbrot(canvas, xmin, xmax, ymin, ymax, iterations)
+﻿/*list of cool points:
+
+-0.7349550997530568 + 0.19704996476661696i
+0.23674750381213505 + 0.5185951970728484i
+*/
+
+function mandelbrot(canvas, xmin, xmax, ymin, ymax, iterations)
 {
+	var iterations_4 = iterations / 4;
 	var palette = []
 	for (var i = 0; i <= iterations; i++)
 	{
-		palette.push([map(i, 0, iterations, 10, 255), map(i, 0, iterations, 10, 255), map(i, 0, iterations, 100, 255)])
+		if (i < iterations_4) //from i = 0 to i = iterations / 8 - 1
+		{
+			//blue to tan
+			var blue = [10, 10, 120];
+			var tan = [220, 160, 60];
+			palette.push(
+			[map(i, 0, iterations_4, blue[0], tan[0]),
+			 map(i, 0, iterations_4, blue[1], tan[1]),
+			 map(i, 0, iterations_4, blue[2], tan[2])]);
+		}
+		else if (i < iterations_4 * 2.5) //from i = iterations / 4 to i = 5 * iterations / 8 - 1
+		{
+			var tan = [220, 160, 60];
+			var yellow = [250, 225, 50];
+			palette.push(
+			[map(i, iterations_4, iterations_4 * 2.5, tan[0], yellow[0]),
+			 map(i, iterations_4, iterations_4 * 2.5, tan[1], yellow[1]),
+			 map(i, iterations_4, iterations_4 * 2.5, tan[2], yellow[2])]);
+		}
+		else //from i = iterations / 2 to i = iterations
+		{
+			var yellow = [250, 225, 50];
+			var white = [255, 255, 255];
+			palette.push(
+			[map(i, iterations_4 * 2.5, iterations, yellow[0], white[0]),
+			 map(i, iterations_4 * 2.5, iterations, yellow[1], white[1]),
+			 map(i, iterations_4 * 2.5, iterations, yellow[2], white[2])]);
+		}
 	}
-	palette.push([0, 0, 0]);
 	
 	var width = canvas.width;
 	var height = canvas.height;
@@ -51,27 +84,22 @@
 				var color1 = Math.floor(mu) % palette.length;
 				var color2 = (color1 + 1) % palette.length;
 				var frac = mu % 1;
-				if (color1 < 0 || color1 > palette.length) {console.log(mu);}
-				if (color2 < 0 || color2 > palette.length) {console.log(mu);}
-				var red1 = palette[color1][0];
-				var red2 = palette[color2][0];
-				var grn1 = palette[color1][1];
-				var grn2 = palette[color2][1];
-				var blu1 = palette[color1][2];
-				var blu2 = palette[color2][2];
-				var red = map(frac, 0, 1, red1, red2);
-				var green = map(frac, 0, 1, grn1, grn2);
-				var blue = map(frac, 0, 1, blu1, blu2);
-				pix[pix_pos] = red;
-				pix[pix_pos + 1] = green;
-				pix[pix_pos + 2] = blue;
+				if (palette[color1] == null) {console.log(iteration, xmin, ymin)};
+				pix[pix_pos] = map(frac, 0, 1, palette[color1][0], palette[color2][0]);
+				pix[pix_pos + 1] = map(frac, 0, 1, palette[color1][1], palette[color2][1]);
+				pix[pix_pos + 2] = map(frac, 0, 1, palette[color1][2], palette[color2][2]);
 			}
 			pix[pix_pos + 3] = 255;
 		}
 		
 	}
 	ctx.putImageData(img, 0, 0);
-	document.getElementById("statusBar").innerHTML = "Center(" + centerx + ", " + -centery + ")";
+}
+
+function drawmand(canvas, centerx, centery, zoom, reitr)
+{
+	itr = reitr ? 80 / (Math.pow(zoomlevel, 0.2)) : itr;
+	mandelbrot(canvas, -3 * zoomlevel + centerx, 3 * zoomlevel + centerx, -2 * zoomlevel - centery, 2 * zoomlevel - centery, itr);
 }
 
 function map(x, in_min, in_max, out_min, out_max)
@@ -82,29 +110,45 @@ function map(x, in_min, in_max, out_min, out_max)
 function gohome()
 {
 	zoomlevel = 1;
-	itr = 20;
+	itr = 80;
 	centerx = -1;
 	centery = 0;
-	mandelbrot(canvas, -3 * zoomlevel + centerx, 3 * zoomlevel + centerx, -2 * zoomlevel + centery, 2 * zoomlevel + centery, itr);
+	drawmand(canvas, centerx, centery, zoomlevel, true)
 }
 
-function zoom()
+function zoom(level)
 {
-	zoomlevel *= 0.99;
-	itr = 20 / (Math.pow(zoomlevel, 0.2));
-	mandelbrot(canvas, -3 * zoomlevel + centerx, 3 * zoomlevel + centerx, -2 * zoomlevel + centery, 2 * zoomlevel + centery, itr);
+	zoomlevel = level;
+	drawmand(canvas, centerx, centery, zoomlevel, true);
 }
+
+function zoom_auto()
+{
+	zoom(zoomlevel * 0.9);
+}
+
+function redraw()
+{
+	centerx = parseFloat(document.getElementById('centerx').value);
+	centery = parseFloat(document.getElementById('centery').value);
+	zoomlevel = parseFloat(document.getElementById('zoomlevel').value);
+	drawmand(canvas, centerx, centery, zoomlevel, true);
+}
+
  
 var canvas = document.getElementById('MandelbrotCanvas');
 document.body.insertBefore(canvas, document.body.childNodes[0]);
 var zoomlevel = 1;
-var itr = 20;
+var itr = 80;
 var centerx = -1;
 var centery = 0;
 var centerchangeable = true;
 var zooming = false;
 var timer;
 gohome();
+document.getElementById('centerx').value = centerx;
+document.getElementById('centery').value = centery;
+document.getElementById('zoomlevel').value = zoomlevel;
 
 canvas.addEventListener('dblclick', function(event) {gohome();}, false);
 
@@ -117,19 +161,21 @@ canvas.addEventListener('wheel', function(event)
 	y *= y * y * zoomlevel / 10;
 	if (centerchangeable)
 	{
-		var dx = map(x, ((-canvas.width / 2) ** 3) * 0.05, ((canvas.width / 2) ** 3) * 0.05, -0.075, 0.075);
-		var dy = map(y, ((-canvas.height / 2) ** 3) * 0.05, ((canvas.height / 2) ** 3) * 0.05, -0.05, 0.05);
+		var dx = map(x, ((-canvas.width / 2) ** 3) * 0.05, ((canvas.width / 2) ** 3) * 0.05, -0.075, 0.075) * Math.abs(event.deltaY / 100);
+		var dy = map(y, ((-canvas.height / 2) ** 3) * 0.05, ((canvas.height / 2) ** 3) * 0.05, -0.05, 0.05) * Math.abs(event.deltaY / 100);
 		centerx += event.deltaY < 0 ? dx : -dx;
-		centery += event.deltaY < 0 ? dy : -dy;
+		centery -= event.deltaY < 0 ? dy : -dy;
 	}
-	mandelbrot(canvas, -3 * zoomlevel + centerx, 3 * zoomlevel + centerx, -2 * zoomlevel + centery, 2 * zoomlevel + centery, itr);
+	drawmand(canvas, centerx, centery, zoomlevel, false);
+	document.getElementById('centerx').value = centerx.toString();
+	document.getElementById('centery').value = centery.toString();
+	document.getElementById('zoomlevel').value = zoomlevel.toString();
 }, false);
 
 document.addEventListener('keydown', function(event) {
 	if (event.key == 'r')
 	{
-		itr = 20 / (Math.pow(zoomlevel, 0.2));
-		mandelbrot(canvas, -3 * zoomlevel + centerx, 3 * zoomlevel + centerx, -2 * zoomlevel + centery, 2 * zoomlevel + centery, itr);
+		redraw();
 	}
 	if (event.key == 'l')
 	{
@@ -144,7 +190,7 @@ document.addEventListener('keydown', function(event) {
 		}
 		else
 		{
-			timer = window.setInterval(zoom, 10);
+			timer = window.setInterval(zoom_auto, 1000);
 			zooming = true;
 		}
 	}
