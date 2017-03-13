@@ -1,6 +1,7 @@
 ﻿/*list of cool points:
 
 -0.7349550997530568 + 0.19704996476661696i
+-1.2483144568121969 + 0.056351259616207i
 0.23674750381213505 + 0.5185951970728484i
 */
 
@@ -157,12 +158,12 @@ canvas.addEventListener('wheel', function(event)
 	zoomlevel /= (100 - (event.deltaY) / 25) / 100;
 	var x = event.pageX - canvas.width / 2;
 	var y = event.pageY - canvas.height / 2;
-	x *= x * x * zoomlevel / 10;
-	y *= y * y * zoomlevel / 10;
+	x = (x ** 3) * zoomlevel / 10;
+	y = (y ** 3) * zoomlevel / 10;
 	if (centerchangeable)
 	{
-		var dx = map(x, ((-canvas.width / 2) ** 3) * 0.05, ((canvas.width / 2) ** 3) * 0.05, -0.075, 0.075) * Math.abs(event.deltaY / 100);
-		var dy = map(y, ((-canvas.height / 2) ** 3) * 0.05, ((canvas.height / 2) ** 3) * 0.05, -0.05, 0.05) * Math.abs(event.deltaY / 100);
+		var dx = map(x, ((-canvas.width / 2) ** 3) * 0.05, ((canvas.width / 2) ** 3) * 0.05, -0.075, 0.075) * Math.abs(event.deltaY / 50);
+		var dy = map(y, ((-canvas.height / 2) ** 3) * 0.05, ((canvas.height / 2) ** 3) * 0.05, -0.05, 0.05) * Math.abs(event.deltaY / 50);
 		centerx += event.deltaY < 0 ? dx : -dx;
 		centery -= event.deltaY < 0 ? dy : -dy;
 	}
@@ -190,7 +191,7 @@ document.addEventListener('keydown', function(event) {
 		}
 		else
 		{
-			timer = window.setInterval(zoom_auto, 1000);
+			timer = window.setInterval(zoom_auto, 100);
 			zooming = true;
 		}
 	}
