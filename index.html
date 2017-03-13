@@ -3,15 +3,22 @@
   <title>Projects by Reed Foster</title>
   </head>
   <body>
-	<canvas id="MandelbrotCanvas" width="1280" height="800"></canvas>
-	<div>x<input id="centerx" type="text" label="x"/>
-	<br/>
-	y<input id="centery" type="text" label="y"/>
-	<br/>
-	zoom<input id="zoomlevel" type="text"/>
-	<br/>
-	<button onclick="redraw()">Draw</button>
-	</div>
+	<table border="0">
+	<tr>
+		<td rowspan="3"><b>Mandelbrot Set Imager&emsp;</b><br/>By Reed Foster<br/><div id="ver"/></td>
+		<td><input id="centerx" type="text" label="x" size="20" maxlength="12" onkeyup="restrictInput(event)"/><label id="x"><b>X</b></label></td>
+		<td><b>Resolution</b></td>
+	</tr>
+	<tr>
+		<td><input id="centery" type="text" label="y" size="20" maxlength="12" onkeyup="restrictInput(event)"/><label id="y"><b>Y</b></label></td>
+		<td><input id="res" type="range" value="0" label="resolution" onchange="redraw()"/></td>
+	</tr>
+	<tr>
+		<td><input id="zoomlevel" type="text" label="zoom" size="20" maxlength="12" onkeyup="restrictInput(event)"/><label id="zoom"><b>Zoom&emsp;</b></label></td>
+		<td><button onclick="redraw()">Draw</button></td>
+	</tr>
+	</table>
+	<canvas id="MandelbrotCanvas" width="1280" height="800"/>
     <script language="javascript" type="text/javascript" src="mandelbrot.js">
     </script>
   </body>

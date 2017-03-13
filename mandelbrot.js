@@ -4,8 +4,11 @@
 -1.2483144568121969 + 0.056351259616207i
 0.23674750381213505 + 0.5185951970728484i
 */
+var VERSION_NUM = "1.0"
+var DEFAULTWIDTH = 1200;
+var DEFAULTHEIGHT = 800;
 
-function mandelbrot(canvas, xmin, xmax, ymin, ymax, iterations)
+function mandelbrot(canvas, xmin, xmax, ymin, ymax, iterations, resolution)
 {
 	var iterations_4 = iterations / 4;
 	var palette = []
@@ -48,16 +51,15 @@ function mandelbrot(canvas, xmin, xmax, ymin, ymax, iterations)
 	var img = ctx.getImageData(0, 0, width, height);
 	var pix = img.data;
  
-	for (var ix = 0; ix < width; ++ix) {
-		for (var iy = 0; iy < height; ++iy) {
-			var x0 = xmin + (xmax - xmin) * ix / (width - 1);
-			var y0 = ymin + (ymax - ymin) * iy / (height - 1);
+	for (var ix = 0; ix < width / resolution; ix++) {
+		for (var iy = 0; iy < height / resolution; iy++) {
+			var x0 = map(ix, 0, width / resolution, xmin, xmax);//xmin + (xmax - xmin) * ix / ((width - 1));
+			var y0 = map(iy, 0, height / resolution, ymin, ymax);//ymin + (ymax - ymin) * iy / ((height - 1));
 			var x = 0.0;
 			var y = 0.0;
 			var iteration = 0;
-			var max_iteration = 1000;
 			
-			var pix_pos = 4 * (width * iy + ix);
+			var pix_pos = 4 * (resolution * width * iy + resolution * ix);
 			
 			while (x*x + y*y < 16  &&  iteration <= iterations)
 			{
@@ -68,9 +70,15 @@ function mandelbrot(canvas, xmin, xmax, ymin, ymax, iterations)
 			}
 			if (iteration >= iterations)
 			{
-				pix[pix_pos] = 0;
-				pix[pix_pos + 1] = 0;
-				pix[pix_pos + 2] = 0;
+				for(var i = 0; i < resolution; i++)
+				{
+					for(var j = 0; j < resolution; j++)
+					{
+						pix[pix_pos + (i * width + j) * 4] = 0;
+						pix[pix_pos + 1 + (i * width + j) * 4] = 0;
+						pix[pix_pos + 2 + (i * width + j) * 4] = 0;
+					}
+				}
 			}
 			else
 			{
@@ -86,21 +94,35 @@ function mandelbrot(canvas, xmin, xmax, ymin, ymax, iterations)
 				var color2 = (color1 + 1) % palette.length;
 				var frac = mu % 1;
 				if (palette[color1] == null) {console.log(iteration, xmin, ymin)};
-				pix[pix_pos] = map(frac, 0, 1, palette[color1][0], palette[color2][0]);
-				pix[pix_pos + 1] = map(frac, 0, 1, palette[color1][1], palette[color2][1]);
-				pix[pix_pos + 2] = map(frac, 0, 1, palette[color1][2], palette[color2][2]);
+				for (var i = 0; i < resolution; i++)
+				{
+					for (var j = 0; j < resolution; j++)
+					{
+						pix[pix_pos + (i * width + j) * 4] = map(frac, 0, 1, palette[color1][0], palette[color2][0]);
+						pix[pix_pos + 1 + (i * width + j) * 4] = map(frac, 0, 1, palette[color1][1], palette[color2][1]);
+						pix[pix_pos + 2 + (i * width + j) * 4] = map(frac, 0, 1, palette[color1][2], palette[color2][2]);
+					}
+				}
 			}
-			pix[pix_pos + 3] = 255;
+			for (var i = 0; i < resolution; i++)
+			{
+				for (var j = 0; j < resolution; j++)
+				{
+					pix[pix_pos + 3 + (i * width + j) * 4] = 255;
+				}
+			}
 		}
-		
 	}
 	ctx.putImageData(img, 0, 0);
 }
 
 function drawmand(canvas, centerx, centery, zoom, reitr)
 {
+	var res = Math.floor(Math.pow(parseInt(document.getElementById('res').value) / 40, 2) + 1);
+	//canvas.width = DEFAULTWIDTH / res;
+	//canvas.height = DEFAULTHEIGHT / res;
 	itr = reitr ? 80 / (Math.pow(zoomlevel, 0.2)) : itr;
-	mandelbrot(canvas, -3 * zoomlevel + centerx, 3 * zoomlevel + centerx, -2 * zoomlevel - centery, 2 * zoomlevel - centery, itr);
+	mandelbrot(canvas, -3 * zoomlevel + centerx, 3 * zoomlevel + centerx, -2 * zoomlevel - centery, 2 * zoomlevel - centery, itr, res);
 }
 
 function map(x, in_min, in_max, out_min, out_max)
@@ -136,6 +158,13 @@ function redraw()
 	drawmand(canvas, centerx, centery, zoomlevel, true);
 }
 
+function restrictInput(event)
+{
+	//var str = event.target.value;
+	//var flt = parseFloat(str);
+	//if (isNaN(flt)) {event.target.value = ""; return;}
+	//event.target.value = flt.toString() + (str.charAt(str.length - 1) == '.' && str.indexOf('.') == (str.length - 1) ? '.' : '');
+}
  
 var canvas = document.getElementById('MandelbrotCanvas');
 document.body.insertBefore(canvas, document.body.childNodes[0]);
@@ -150,6 +179,7 @@ gohome();
 document.getElementById('centerx').value = centerx;
 document.getElementById('centery').value = centery;
 document.getElementById('zoomlevel').value = zoomlevel;
+document.getElementById('ver').innerHTML = "Version " + VERSION_NUM;
 
 canvas.addEventListener('dblclick', function(event) {gohome();}, false);
 
