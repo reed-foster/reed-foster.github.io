@@ -10,39 +10,7 @@ var DEFAULTHEIGHT = 800;
 
 function mandelbrot(canvas, xmin, xmax, ymin, ymax, iterations, resolution)
 {
-   var iterations_4 = iterations / 4;
-   var palette = []
-   for (var i = 0; i <= iterations; i++)
-   {
-      if (i < iterations_4) //from i = 0 to i = iterations / 8 - 1
-      {
-         //blue to tan
-         var blue = [10, 10, 120];
-         var tan = [220, 160, 60];
-         palette.push(
-         [map(i, 0, iterations_4, blue[0], tan[0]),
-          map(i, 0, iterations_4, blue[1], tan[1]),
-          map(i, 0, iterations_4, blue[2], tan[2])]);
-      }
-      else if (i < iterations_4 * 2.5) //from i = iterations / 4 to i = 5 * iterations / 8 - 1
-      {
-         var tan = [220, 160, 60];
-         var yellow = [250, 225, 50];
-         palette.push(
-         [map(i, iterations_4, iterations_4 * 2.5, tan[0], yellow[0]),
-          map(i, iterations_4, iterations_4 * 2.5, tan[1], yellow[1]),
-          map(i, iterations_4, iterations_4 * 2.5, tan[2], yellow[2])]);
-      }
-      else //from i = iterations / 2 to i = iterations
-      {
-         var yellow = [250, 225, 50];
-         var white = [255, 255, 255];
-         palette.push(
-         [map(i, iterations_4 * 2.5, iterations, yellow[0], white[0]),
-          map(i, iterations_4 * 2.5, iterations, yellow[1], white[1]),
-          map(i, iterations_4 * 2.5, iterations, yellow[2], white[2])]);
-      }
-   }
+   
    
    var width = canvas.width;
    var height = canvas.height;
@@ -53,8 +21,8 @@ function mandelbrot(canvas, xmin, xmax, ymin, ymax, iterations, resolution)
  
    for (var ix = 0; ix < width / resolution; ix++) {
       for (var iy = 0; iy < height / resolution; iy++) {
-         var x0 = map(ix, 0, width / resolution, xmin, xmax);//xmin + (xmax - xmin) * ix / ((width - 1));
-         var y0 = map(iy, 0, height / resolution, ymin, ymax);//ymin + (ymax - ymin) * iy / ((height - 1));
+         var x0 = map(ix, 0, width / resolution, xmin, xmax);
+         var y0 = map(iy, 0, height / resolution, ymin, ymax);
          var x = 0.0;
          var y = 0.0;
          var iteration = 0;
@@ -114,6 +82,46 @@ function mandelbrot(canvas, xmin, xmax, ymin, ymax, iterations, resolution)
       }
    }
    ctx.putImageData(img, 0, 0);
+}
+
+function gencolors(iterations)
+{
+   var iterations_4 = iterations / 4;
+   var palette = [];
+   var yellow = [250, 225, 50];
+   var white = [255, 255, 255];
+   var tan = [220, 160, 60];
+   var yellow = [250, 225, 50];
+   var blue = [10, 10, 120];
+   var tan = [220, 160, 60];
+   for (var i = 0; i <= iterations; i++)
+   {
+      if (i < iterations_4) //from i = 0 to i = iterations / 8 - 1
+      {
+         //blue to tan
+         palette.push(
+         [map(i, 0, iterations_4, blue[0], tan[0]),
+          map(i, 0, iterations_4, blue[1], tan[1]),
+          map(i, 0, iterations_4, blue[2], tan[2])]);
+      }
+      else if (i < iterations_4 * 2.5) //from i = iterations / 4 to i = 5 * iterations / 8 - 1
+      {
+         //tan to yellow
+         palette.push(
+         [map(i, iterations_4, iterations_4 * 2.5, tan[0], yellow[0]),
+          map(i, iterations_4, iterations_4 * 2.5, tan[1], yellow[1]),
+          map(i, iterations_4, iterations_4 * 2.5, tan[2], yellow[2])]);
+      }
+      else //from i = iterations / 2 to i = iterations
+      {
+         //yellow to white
+         palette.push(
+         [map(i, iterations_4 * 2.5, iterations, yellow[0], white[0]),
+          map(i, iterations_4 * 2.5, iterations, yellow[1], white[1]),
+          map(i, iterations_4 * 2.5, iterations, yellow[2], white[2])]);
+      }
+   }
+   return palette;
 }
 
 function drawmand(canvas, centerx, centery, zoom, reitr)
