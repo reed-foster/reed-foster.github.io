@@ -219,7 +219,7 @@ canvas.addEventListener('wheel', function(event) {
    x = (x * x * x) * zoomlevel / 10;
    y = (y * y * y) * zoomlevel / 10;
    if (centerchangeable) {
-      var dx = map(y, ((-canvas.width / 2) ** 3) * 0.05, ((canvas.width / 2) ** 3) * 0.05, -0.075, 0.075) * Math.abs(event.deltaY / 50);
+      var dx = map(x, ((-canvas.width / 2) ** 3) * 0.05, ((canvas.width / 2) ** 3) * 0.05, -0.075, 0.075) * Math.abs(event.deltaY / 50);
       var dy = map(y, ((-canvas.height / 2) ** 3) * 0.05, ((canvas.height / 2) ** 3) * 0.05, -0.05, 0.05) * Math.abs(event.deltaY / 50);
       centerx += event.deltaY < 0 ? dx : -dx;
       centery -= event.deltaY < 0 ? dy : -dy;
