@@ -1,2 +1,4 @@
 Version 1.0
 	Initial working version, single mandelbrot zoomer
+Version 1.1
+	Added Julia Set zoomer and directions
