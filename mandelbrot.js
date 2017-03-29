@@ -95,7 +95,7 @@ function julia(canvas, min, max, c, iterations, resolution)
 
          var pix_pos = 4 * (resolution * width * iim + resolution * ire);
 
-         while (z.re * z.re + z.im * z.im < 2 && iteration <= iterations)
+         while (z.re * z.re + z.im * z.im < 16 && iteration <= iterations)
          {
             z = iteratedfunc(z, c);
             iteration++;
