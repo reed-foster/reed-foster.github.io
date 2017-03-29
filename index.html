@@ -4,22 +4,45 @@
   </head>
   <body>
 	<table border="0">
-	<tr>
-		<td rowspan="3"><b>Mandelbrot Set Imager&emsp;</b><br/>By Reed Foster<br/><div id="ver"/></td>
-		<td><input id="centerx" type="text" label="x" size="20" maxlength="12" onkeyup="restrictInput(event)"/><label id="x"><b>X</b></label></td>
-		<td><b>Resolution</b></td>
-	</tr>
-	<tr>
-		<td><input id="centery" type="text" label="y" size="20" maxlength="12" onkeyup="restrictInput(event)"/><label id="y"><b>Y</b></label></td>
-		<td><input id="res" type="range" value="0" label="resolution" onchange="redraw()"/></td>
-	</tr>
-	<tr>
-		<td><input id="zoomlevel" type="text" label="zoom" size="20" maxlength="12" onkeyup="restrictInput(event)"/><label id="zoom"><b>Zoom&emsp;</b></label></td>
-		<td><button onclick="redraw()">Draw</button></td>
-	</tr>
+		<tr>
+		<td>
+		<canvas id="MandelbrotCanvas" width="900" height="600"></canvas>
+		<table border="0">
+		<tr>
+			<td rowspan="3"><b>Mandelbrot Set Imager&emsp;</b><br/>By Reed Foster<br/><div id="ver"></div></td>
+			<td><input id="mandcenter_re" type="text" label="mand_re" size="20" maxlength="12"/><label id="mand_re"><b>Re</b></label></td>
+			<td><b>Resolution</b></td>
+		</tr>
+		<tr>
+			<td><input id="mandcenter_im" type="text" label="mand_im" size="20" maxlength="12"/><label id="mand_im"><b>Im</b></label></td>
+			<td><input id="mand_res" type="range" value="0" onchange="mand_redraw()"/></td>
+		</tr>
+		<tr>
+			<td><input id="mandzoom" type="text" label="mzoom" size="20" maxlength="12"/><label id="mzoom"><b>Zoom&emsp;</b></label></td>
+			<td><button onclick="mand_redraw()">Draw</button></td>
+		</tr>
+		</table>
+	   </td>
+	   <td>
+	   <canvas id="JuliaCanvas" width="900" height="600"></canvas>
+		<table border="0">
+		<tr>
+			<td rowspan="3"><b>Julia Set Imager&emsp;</b><br/>By Reed Foster<br/><div id="ver"></div></td>
+			<td><input id="julcenter_re" type="text" label="jul_re" size="20" maxlength="12"/><label id="jul_re"><b>Re</b></label></td>
+			<td><b>Resolution</b></td>
+		</tr>
+		<tr>
+			<td><input id="julcenter_im" type="text" label="jul_im" size="20" maxlength="12"/><label id="jul_im"><b>Im</b></label></td>
+			<td><input id="jul_res" type="range" value="0" onchange="jul_redraw()"/></td>
+		</tr>
+		<tr>
+			<td><input id="julzoom" type="text" label="jzoom" size="20" maxlength="12"/><label id="jzoom"><b>Zoom&emsp;</b></label></td>
+			<td><button onclick="jul_redraw()">Draw</button></td>
+		</tr>
+		</table>
+		</td>
+		</tr>
 	</table>
-	<canvas id="MandelbrotCanvas" width="900" height="600"/>
-    <script language="javascript" type="text/javascript" src="mandelbrot.js">
-    </script>
+   <script language="javascript" type="text/javascript" src="mandelbrot.js"></script>
   </body>
 </html>

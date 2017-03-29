@@ -4,7 +4,30 @@
 -1.2483144568121969 + 0.056351259616207i
 0.23674750381213505 + 0.5185951970728484i
 */
-var VERSION_NUM = "1.0";
+
+var VERSION_NUM = "1.1";
+
+var mandelbrot_canvas = document.getElementById('MandelbrotCanvas');
+var mandelbrot_center = {re : 0, im : 0};
+var mandelbrot_zoom = 1;
+var mandelbrot_itr = 80;
+var mandelbrot_state = {locked : false, zooming : false};
+var mandelbrottimer;
+
+var julia_canvas = document.getElementById('JuliaCanvas');
+var julia_center = {re : 0, im : 0};
+var julia_zoom = 1;
+var julia_itr = 80;
+var julia_state = {locked : false, zooming : false};
+var juliatimer;
+
+document.getElementById('mandcenter_re').value = mandelbrot_center.re;
+document.getElementById('mandcenter_im').value = mandelbrot_center.im;
+document.getElementById('mandzoom').value = mandelbrot_zoom;
+document.getElementById('julcenter_re').value = julia_center.re;
+document.getElementById('julcenter_im').value = julia_center.im;
+document.getElementById('julzoom').value = julia_zoom;
+document.getElementById('ver').innerHTML = "Version " + VERSION_NUM;
 
 function mandelbrot(canvas, min, max, iterations, resolution)
 {
@@ -154,96 +177,140 @@ function gencolors(iterations)
    return palette;
 }
 
-function drawmand(canvas, centerx, centery, zoom, reitr)
-{
-   var res = Math.floor(Math.pow((100 - parseInt(document.getElementById('res').value)) / 40, 2) + 1);
-   itr = reitr ? 80 / (Math.pow(zoomlevel, 0.2)) : itr;
-   mandelbrot(canvas, {re : -3 * zoomlevel + centerx, im : -2 * zoomlevel - centery}, {re : 3 * zoomlevel + centerx, im : 2 * zoomlevel - centery}, itr, res);
-}
-
 function map(x, in_min, in_max, out_min, out_max)
 {
    return (out_max - out_min) / (in_max - in_min) * (x - in_min) + out_min;
 }
 
+function drawmand(canvas, center, zoom, reitr)
+{
+   var res = Math.floor(Math.pow((100 - parseInt(document.getElementById('mand_res').value)) / 40, 2) + 1);
+   mandelbrot_itr = reitr ? 80 / (Math.pow(zoom, 0.2)) : mandelbrot_itr;
+   mandelbrot(canvas, {re : -3 * zoom + mandelbrot_center.re, im : -2 * zoom - mandelbrot_center.im}, {re : 3 * zoom + mandelbrot_center.re, im : 2 * zoom - mandelbrot_center.im}, mandelbrot_itr, res);
+}
+
+function drawjulia(canvas, c, center, zoom, reitr)
+{
+	var res = Math.floor(Math.pow((100 - parseInt(document.getElementById('jul_res').value)) / 40, 2) + 1);
+   julia_itr = reitr ? 80 / (Math.pow(zoom, 0.2)) : julia_itr;
+   julia(canvas, mandelbrot_center, {re : -3 * zoom + julia_center.re, im : -2 * zoom - julia_center.im}, {re : 3 * zoom + julia_center.re, im : 2 * zoom - julia_center.im}, julia_itr, res);
+}
+
 function gohome()
 {
-   zoomlevel = 1;
-   itr = 80;
-   centerx = -1;
-   centery = 0;
-   drawmand(canvas, centerx, centery, zoomlevel, true);
+   mandelbrot_zoom = 1;
+   mandelbrot_itr = 80;
+   mandelbrot_center = {re : 0, im : 0};
+   drawmand(mandelbrot_canvas, mandelbrot_center, mandelbrot_zoom, true);
+   julia_zoom - 1;
+   julia_itr = 80;
+   julia_center = {re : 0, im : 0};
+   drawjulia(julia_canvas, mandelbrot_center, julia_center, julia_zoom, true);
 }
 
-function zoom(level)
+function mandelbrotzoom_auto(level)
 {
-   zoomlevel = level;
-   drawmand(canvas, centerx, centery, zoomlevel, true);
+	mandelbrot_zoom = mandelbrot_zoom * 0.9;
+   drawmand(mandelbrot_canvas, mandelbrot_center, mandelbrot_zoom, true);
 }
 
-function zoom_auto()
+function juliazoom_auto()
 {
-   zoom(zoomlevel * 0.9);
+	julia_zoom = julia_zoom * 0.9;
+   drawjulia(julia_canvas, mandelbrot_center, julia_center, julia_zoom, true);
 }
 
-function redraw()
+function mand_redraw()
 {
-   centerx = parseFloat(document.getElementById('centerx').value);
-   centery = parseFloat(document.getElementById('centery').value);
-   zoomlevel = parseFloat(document.getElementById('zoomlevel').value);
-   drawmand(canvas, centerx, centery, zoomlevel, true);
+   mandelbrot_center.re = parseFloat(document.getElementById('mandcenter_re').value);
+   mandelbrot_center.im = parseFloat(document.getElementById('mandcenter_im').value);
+   mandelbrot_zoom = parseFloat(document.getElementById('mandzoom').value);
+   drawmand(mandelbrot_canvas, mandelbrot_center, mandelbrot_zoom, true);
 }
 
-var canvas = document.getElementById('MandelbrotCanvas');
-document.body.insertBefore(canvas, document.body.childNodes[0]);
-var zoomlevel = 1;
-var itr = 80;
-var centerx = -1;
-var centery = 0;
-var centerchangeable = true;
-var zooming = false;
-var timer;
-gohome();
-document.getElementById('centerx').value = centerx;
-document.getElementById('centery').value = centery;
-document.getElementById('zoomlevel').value = zoomlevel;
-document.getElementById('ver').innerHTML = "Version " + VERSION_NUM;
+function jul_redraw()
+{
+   julia_center.re = parseFloat(document.getElementById('mandcenter_re').value);
+   julia_center.im = parseFloat(document.getElementById('mandcenter_im').value);
+   julia_zoom = parseFloat(document.getElementById('julzoom').value);
+   drawjulia(julia_canvas, mandelbrot_center, julia_center, julia_zoom, true);
+}
 
-canvas.addEventListener('dblclick', function(event) {gohome();}, false);
+mandelbrot_canvas.addEventListener('dblclick', function(event) {gohome();}, false);
+julia_canvas.addEventListener('dblclick', function(event) {gohome();}, false);
 
-canvas.addEventListener('wheel', function(event) {
-   zoomlevel /= (100 - (event.deltaY) / 25) / 100;
+mandelbrot_canvas.addEventListener('wheel', function(event) {
+	var zfactor = 1 / (1 - (event.deltaY / 2500));
+   mandelbrot_zoom *= zfactor;
    
-   var x = event.pageX - canvas.width / 2;
-   var y = event.pageY - canvas.height / 2;
-   x = (x * x * x) * zoomlevel / 10;
-   y = (y * y * y) * zoomlevel / 10;
-   if (centerchangeable) {
-      var dx = map(x, ((-canvas.width / 2) ** 3) * 0.05, ((canvas.width / 2) ** 3) * 0.05, -0.075, 0.075) * Math.abs(event.deltaY / 50);
-      var dy = map(y, ((-canvas.height / 2) ** 3) * 0.05, ((canvas.height / 2) ** 3) * 0.05, -0.05, 0.05) * Math.abs(event.deltaY / 50);
-      centerx += event.deltaY < 0 ? dx : -dx;
-      centery -= event.deltaY < 0 ? dy : -dy;
-   }
-   drawmand(canvas, centerx, centery, zoomlevel, false);
-   document.getElementById('centerx').value = centerx.toString();
-   document.getElementById('centery').value = centery.toString();
-   document.getElementById('zoomlevel').value = zoomlevel.toString();
+   var pix = {x : event.pageX - mandelbrot_canvas.width / 2, y : mandelbrot_canvas.height / 2 - event.pageY};
+   var mincplx = {re : mandelbrot_center.re - 3 * mandelbrot_zoom, im : mandelbrot_center.im - 2 * mandelbrot_zoom};
+   var maxcplx = {re : mandelbrot_center.re + 3 * mandelbrot_zoom, im : mandelbrot_center.im + 2 * mandelbrot_zoom};
+   var zoomcplx = {re : map(pix.x, -mandelbrot_canvas.width / 2, mandelbrot_canvas.width / 2, mincplx.re, maxcplx.re), im : map(pix.y, -mandelbrot_canvas.height / 2, mandelbrot_canvas.height / 2, mincplx.im, maxcplx.im)};
+   var zoomcent = mandelbrot_state.locked ? mandelbrot_center : zoomcplx;
+   var newmin = {re : zoomcent.re * (1 - zfactor) + zfactor * mincplx.re, im : zoomcent.im * (1 - zfactor) + zfactor * mincplx.im};
+   var newmax = {re : zoomcent.re * (1 - zfactor) + zfactor * maxcplx.re, im : zoomcent.im * (1 - zfactor) + zfactor * maxcplx.im};
+   drawmand(mandelbrot_canvas, mandelbrot_center, mandelbrot_zoom, false);
+   document.getElementById('mandcenter_re').value = mandelbrot_center.re.toString();
+	document.getElementById('mandcenter_im').value = mandelbrot_center.im.toString();
+	document.getElementById('mandzoom').value = mandelbrot_zoom.toString();
+}, false);
+
+julia_canvas.addEventListener('wheel', function(event) {
+	var zfactor = 1 / (1 - (event.deltaY / 2500));
+   julia_zoom *= zfactor;
+   
+   var pix = {x : event.pageX - julia_canvas.width / 2, y : julia_canvas.height / 2 - event.pageY};
+   var mincplx = {re : julia_center.re - 3 * julia_zoom, im : julia_center.im - 2 * julia_zoom};
+   var maxcplx = {re : julia_center.re + 3 * julia_zoom, im : julia_center.im + 2 * julia_zoom};
+   var zoomcplx = {re : map(pix.x, -julia_canvas.width / 2, julia_canvas.width / 2, mincplx.re, maxcplx.re), im : map(pix.y, -julia_canvas.height / 2, julia_canvas.height / 2, mincplx.im, maxcplx.im)};
+   var zoomcent = julia_state.locked ? julia_center : zoomcplx;
+   var newmin = {re : zoomcent.re * (1 - zfactor) + zfactor * mincplx.re, im : zoomcent.im * (1 - zfactor) + zfactor * mincplx.im};
+   var newmax = {re : zoomcent.re * (1 - zfactor) + zfactor * maxcplx.re, im : zoomcent.im * (1 - zfactor) + zfactor * maxcplx.im};
+   drawjulia(julia_canvas, mandelbrot_center, julia_center, julia_zoom, false);
+   document.getElementById('mandcenter_re').value = julia_center.re.toString();
+	document.getElementById('mandcenter_im').value = julia_center.im.toString();
+	document.getElementById('mandzoom').value = julia_zoom.toString();
 }, false);
 
 document.addEventListener('keydown', function(event) {
-   if (event.key == 'r') {
-      redraw();
+   if (event.key == 'r')
+   {
+      mand_redraw();
+      jul_redraw();
    }
-   if (event.key == 'l') {
-      centerchangeable = !centerchangeable;
+   if (event.key == 'm')
+   {
+      mandelbrot_state.locked = !mandelbrot_state.locked;
    }
-   if (event.key == 'z') {
-      if (zooming) {
-         window.clearInterval(timer);
-         zooming = false;
-      } else {
-         timer = window.setInterval(zoom_auto, 100);
-         zooming = true;
+   if (event.key == "j")
+   {
+		julia_state.locked = !julia_state.locked;
+   }
+   if (event.key == 'z')
+   {
+      if (mandelbrot_state.zooming)
+      {
+         window.clearInterval(mandelbrottimer);
+         mandelbrot_state.zooming = false;
       }
+      else
+      {
+         mandelbrottimer = window.setInterval(mandelbrotzoom_auto, 100);
+         mandelbrot_state.zooming = true;
+      }
+   }
+   if (event.key == 'x')
+   {
+   	if (julia_state.zooming)
+   	{
+   		window.clearInterval(juliatimer);
+   		julia_state.zooming = false;
+   	}
+   	else
+   	{
+   		juliatimer = window.setInterval(juliazoom_auto, 100);
+   		julia_state.zooming = true;
+   	}
    }
 }, false);
