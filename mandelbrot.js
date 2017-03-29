@@ -28,6 +28,7 @@ document.getElementById('julcenter_re').value = julia_center.re;
 document.getElementById('julcenter_im').value = julia_center.im;
 document.getElementById('julzoom').value = julia_zoom;
 document.getElementById('ver').innerHTML = "Version " + VERSION_NUM;
+gohome();
 
 function mandelbrot(canvas, min, max, iterations, resolution)
 {
@@ -89,12 +90,12 @@ function julia(canvas, min, max, c, iterations, resolution)
    {
       for (var iim = 0; iim < height / resolution; iim++)
       {
-         var z = {re : 0.0, im : 0.0};
+         var z = {re : map(ire, 0, width / resolution, min.re, max.re), im : map(iim, 0, height / resolution, min.im, max.im)};
          var iteration = 0;
 
          var pix_pos = 4 * (resolution * width * iim + resolution * ire);
 
-         while (z.re * z.re + z.im * z.im < 16 && iteration <= iterations)
+         while (z.re * z.re + z.im * z.im < 2 && iteration <= iterations)
          {
             z = iteratedfunc(z, c);
             iteration++;
@@ -121,11 +122,13 @@ function julia(canvas, min, max, c, iterations, resolution)
    ctx.putImageData(img, 0, 0);
 }
 
-function iteratedfunc(z, c) {
+function iteratedfunc(z, c)
+{
    return {re : z.re * z.re - z.im * z.im + c.re, im : 2 * z.re * z.im + c.im};
 }
 
-function drawpix(pixdat, pos, resolution, width, R, G, B) {
+function drawpix(pixdat, pos, resolution, width, R, G, B)
+{
    for (var i = 0; i < resolution; i++)
    {
       for (var j = 0; j < resolution; j++)
@@ -193,7 +196,7 @@ function drawjulia(canvas, c, center, zoom, reitr)
 {
 	var res = Math.floor(Math.pow((100 - parseInt(document.getElementById('jul_res').value)) / 40, 2) + 1);
    julia_itr = reitr ? 80 / (Math.pow(zoom, 0.2)) : julia_itr;
-   julia(canvas, mandelbrot_center, {re : -3 * zoom + julia_center.re, im : -2 * zoom - julia_center.im}, {re : 3 * zoom + julia_center.re, im : 2 * zoom - julia_center.im}, julia_itr, res);
+   julia(canvas, {re : -3 * zoom + julia_center.re, im : -2 * zoom - julia_center.im}, {re : 3 * zoom + julia_center.re, im : 2 * zoom - julia_center.im}, mandelbrot_center, julia_itr, res);
 }
 
 function gohome()
@@ -230,8 +233,8 @@ function mand_redraw()
 
 function jul_redraw()
 {
-   julia_center.re = parseFloat(document.getElementById('mandcenter_re').value);
-   julia_center.im = parseFloat(document.getElementById('mandcenter_im').value);
+   julia_center.re = parseFloat(document.getElementById('julcenter_re').value);
+   julia_center.im = parseFloat(document.getElementById('julcenter_im').value);
    julia_zoom = parseFloat(document.getElementById('julzoom').value);
    drawjulia(julia_canvas, mandelbrot_center, julia_center, julia_zoom, true);
 }
@@ -240,16 +243,18 @@ mandelbrot_canvas.addEventListener('dblclick', function(event) {gohome();}, fals
 julia_canvas.addEventListener('dblclick', function(event) {gohome();}, false);
 
 mandelbrot_canvas.addEventListener('wheel', function(event) {
+	var win = mandelbrot_canvas.getBoundingClientRect();
 	var zfactor = 1 / (1 - (event.deltaY / 2500));
    mandelbrot_zoom *= zfactor;
    
-   var pix = {x : event.pageX - mandelbrot_canvas.width / 2, y : mandelbrot_canvas.height / 2 - event.pageY};
+   var pix = {x : event.pageX - mandelbrot_canvas.width / 2 - win.left, y : mandelbrot_canvas.height / 2 - event.pageY + win.top};
    var mincplx = {re : mandelbrot_center.re - 3 * mandelbrot_zoom, im : mandelbrot_center.im - 2 * mandelbrot_zoom};
    var maxcplx = {re : mandelbrot_center.re + 3 * mandelbrot_zoom, im : mandelbrot_center.im + 2 * mandelbrot_zoom};
    var zoomcplx = {re : map(pix.x, -mandelbrot_canvas.width / 2, mandelbrot_canvas.width / 2, mincplx.re, maxcplx.re), im : map(pix.y, -mandelbrot_canvas.height / 2, mandelbrot_canvas.height / 2, mincplx.im, maxcplx.im)};
    var zoomcent = mandelbrot_state.locked ? mandelbrot_center : zoomcplx;
    var newmin = {re : zoomcent.re * (1 - zfactor) + zfactor * mincplx.re, im : zoomcent.im * (1 - zfactor) + zfactor * mincplx.im};
    var newmax = {re : zoomcent.re * (1 - zfactor) + zfactor * maxcplx.re, im : zoomcent.im * (1 - zfactor) + zfactor * maxcplx.im};
+   mandelbrot_center = {re : (newmin.re + newmax.re) / 2, im : (newmin.im + newmax.im) / 2};
    drawmand(mandelbrot_canvas, mandelbrot_center, mandelbrot_zoom, false);
    document.getElementById('mandcenter_re').value = mandelbrot_center.re.toString();
 	document.getElementById('mandcenter_im').value = mandelbrot_center.im.toString();
@@ -257,20 +262,22 @@ mandelbrot_canvas.addEventListener('wheel', function(event) {
 }, false);
 
 julia_canvas.addEventListener('wheel', function(event) {
+	var win = julia_canvas.getBoundingClientRect();
 	var zfactor = 1 / (1 - (event.deltaY / 2500));
    julia_zoom *= zfactor;
    
-   var pix = {x : event.pageX - julia_canvas.width / 2, y : julia_canvas.height / 2 - event.pageY};
+   var pix = {x : event.pageX - julia_canvas.width / 2 - win.left, y : julia_canvas.height / 2 - event.pageY + win.top};
    var mincplx = {re : julia_center.re - 3 * julia_zoom, im : julia_center.im - 2 * julia_zoom};
    var maxcplx = {re : julia_center.re + 3 * julia_zoom, im : julia_center.im + 2 * julia_zoom};
    var zoomcplx = {re : map(pix.x, -julia_canvas.width / 2, julia_canvas.width / 2, mincplx.re, maxcplx.re), im : map(pix.y, -julia_canvas.height / 2, julia_canvas.height / 2, mincplx.im, maxcplx.im)};
    var zoomcent = julia_state.locked ? julia_center : zoomcplx;
    var newmin = {re : zoomcent.re * (1 - zfactor) + zfactor * mincplx.re, im : zoomcent.im * (1 - zfactor) + zfactor * mincplx.im};
    var newmax = {re : zoomcent.re * (1 - zfactor) + zfactor * maxcplx.re, im : zoomcent.im * (1 - zfactor) + zfactor * maxcplx.im};
+   julia_center = {re : (newmin.re + newmax.re) / 2, im : (newmin.im + newmax.im) / 2};
    drawjulia(julia_canvas, mandelbrot_center, julia_center, julia_zoom, false);
-   document.getElementById('mandcenter_re').value = julia_center.re.toString();
-	document.getElementById('mandcenter_im').value = julia_center.im.toString();
-	document.getElementById('mandzoom').value = julia_zoom.toString();
+   document.getElementById('julcenter_re').value = julia_center.re.toString();
+	document.getElementById('julcenter_im').value = julia_center.im.toString();
+	document.getElementById('julzoom').value = julia_zoom.toString();
 }, false);
 
 document.addEventListener('keydown', function(event) {
