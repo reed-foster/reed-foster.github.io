@@ -17,7 +17,7 @@ var mandelbrottimer;
 var julia_canvas = document.getElementById('JuliaCanvas');
 var julia_center = {re : 0, im : 0};
 var julia_zoom = 1;
-var julia_itr = 80;
+var julia_itr = 120;
 var julia_state = {locked : false, zooming : false};
 var juliatimer;
 
@@ -195,7 +195,7 @@ function drawmand(canvas, center, zoom, reitr)
 function drawjulia(canvas, c, center, zoom, reitr)
 {
 	var res = Math.floor(Math.pow((100 - parseInt(document.getElementById('jul_res').value)) / 40, 2) + 1);
-   julia_itr = reitr ? 80 / (Math.pow(zoom, 0.2)) : julia_itr;
+   julia_itr = reitr ? 120 / (Math.pow(zoom, 0.2)) : julia_itr;
    julia(canvas, {re : -3 * zoom + julia_center.re, im : -2 * zoom - julia_center.im}, {re : 3 * zoom + julia_center.re, im : 2 * zoom - julia_center.im}, mandelbrot_center, julia_itr, res);
 }
 
@@ -206,7 +206,7 @@ function gohome()
    mandelbrot_center = {re : 0, im : 0};
    drawmand(mandelbrot_canvas, mandelbrot_center, mandelbrot_zoom, true);
    julia_zoom - 1;
-   julia_itr = 80;
+   julia_itr = 120;
    julia_center = {re : 0, im : 0};
    drawjulia(julia_canvas, mandelbrot_center, julia_center, julia_zoom, true);
 }
