@@ -239,6 +239,18 @@ function jul_redraw()
    drawjulia(julia_canvas, mandelbrot_center, julia_center, julia_zoom, true);
 }
 
+function setcenter(re, im)
+{
+	document.getElementById('mandcenter_re').value = re;
+	document.getElementById('mandcenter_im').value = im;
+	document.getElementById('mandzoom').value = 1;
+	document.getElementById('julcenter_re').value = 0;
+	document.getElementById('julcenter_im').value = 0;
+	document.getElementById('julzoom').value = 1;
+	mand_redraw();
+	jul_redraw();
+}
+
 mandelbrot_canvas.addEventListener('dblclick', function(event) {gohome();}, false);
 julia_canvas.addEventListener('dblclick', function(event) {gohome();}, false);
 
