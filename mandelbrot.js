@@ -1,9 +1,13 @@
-/*list of cool points:
-
--0.7349550997530568 + 0.19704996476661696i
--1.2483144568121969 + 0.056351259616207i
-0.23674750381213505 + 0.5185951970728484i
-*/
+//list of cool points
+var points = [
+	[0, 0],
+	[-0.7349550997530568, 0.19704996476661696],
+	[-1.2483144568121969, 0.056351259616207],
+	[0.23674750381213505, 0.5185951970728484],
+	[-0.7577486689132913, 0.18990271866133126],
+	[-1.484583250311164, 0],
+	[0.2720231000978219, 0.00488448042162388]
+];
 
 var VERSION_NUM = "1.1";
 
@@ -251,6 +255,22 @@ function setcenter(re, im)
 	jul_redraw();
 }
 
+function generatepoints()
+{
+	var row = document.getElementById('points');
+	for (var i = 0; i < points.length; i++)
+	{
+		var cell = row.insertCell(i);
+		var button = document.createElement('BUTTON');
+		var re = points[i][0];
+		var im = points[i][1];
+		button.innerHTML = re.toFixed(2) + (im < 0 ? " - " : " + ") + im.toFixed(2) + "i";
+		button.setAttribute('onclick', "setcenter(" + re.toString() + ", " + im.toString() + ")");
+		cell.appendChild(button);
+	}
+}
+
+generatepoints();
 mandelbrot_canvas.addEventListener('dblclick', function(event) {gohome();}, false);
 julia_canvas.addEventListener('dblclick', function(event) {gohome();}, false);
 
