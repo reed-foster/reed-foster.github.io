@@ -1,0 +1,29 @@
+@import url('https://fonts.googleapis.com/css?family=Ubuntu');
+
+nav {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: 0;
+    z-index: 100;
+    opacity: 1;
+    background-color: #64c957;
+    font-family: "Ubuntu"
+}
+
+nav a, nav a:visited {
+    color: #222222;
+}
+
+nav table {
+    margin: 0px;
+    padding: 0px;
+}
+
+nav td:hover {
+    background-color: #ffffff;
+    color : #000000;
+}
