@@ -1,7 +1,15 @@
 @import url('nav.css');
 @import url('project.css');
 
+* {
+    font-family: "Ubuntu";
+}
+
 section {
+    padding-top: 20px;
+}
+
+#about {
     padding-top: 80px;
 }
 

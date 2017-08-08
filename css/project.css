@@ -1,10 +1,12 @@
 .container {
     display: flex;
     justify-content: space-around;
+    height: 350px;
 }
 
 .project {
     width: 250px;
+    height: 300px;
 }
 
 .project header {
