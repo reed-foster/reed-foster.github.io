@@ -12,10 +12,12 @@
 }
 
 .link {
-    width: 64px;
-    height: 64px;
     margin-left: 30px;
     margin-right: 30px;
+}
+
+.link img {
+    height: 64px;
 }
 
 .project header {
