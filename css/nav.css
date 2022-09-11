@@ -1,49 +1,10 @@
 nav {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
     position: fixed;
     top: 0;
     right: 0;
     left: 0;
     z-index: 100;
     opacity: 1;
-    background-color: #ffffff;
-}
-
-nav button {
-    background-color: #666666;
-    color: #222222;
-    border: 0;
-    height: 70px;
-    width: 100%;
-    font-size: 16px;
-    text-align: center;
-    display: inline-block;
-}
-
-nav table {
-    background-color: #666666;
-    border-collapse: collapse;
-    margin: 0px;
-    padding: 0px;
-}
-
-table td {
-    width: 80px;
-}
-
-table td:nth-child(1) {
-    width: 100px;
     background-color: #64c957;
 }
 
-table td:nth-child(2) {
-    width: 200px;
-    background-color: #64c957;
-}
-
-nav button:hover {
-    background-color: #333333;
-    color : #ffffff;
-}
