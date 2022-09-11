@@ -4,6 +4,11 @@
     height: 350px;
 }
 
+.text {
+    width: 800px;
+    text-align: left;
+}
+
 .project {
     width: 250px;
     height: 300px;
